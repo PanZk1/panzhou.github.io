@@ -1,0 +1,219 @@
+<!doctype html> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <link rel=stylesheet  href="/project/libs/highlight/styles/github.min.css"> <link rel=stylesheet  href="/project/css/jtd.css"> <link rel=icon  href="/project/assets/favicon.ico"> <style> /* #148 wrap long header */ .franklin-content a.header-anchor, .franklin-toc li a { word-wrap: break-word; white-space: normal; } </style> <title>More goodies</title> <div class=page-wrap > <div class=side-bar > <div class=header > <a href="/project/" class=title > Franklin </a> </div> <label for=show-menu  class=show-menu >MENU</label> <input type=checkbox  id=show-menu  role=button > <div class=menu  id=side-menu > <ul class=menu-list > <li class="menu-list-item "><a href="/project/" class="menu-list-link ">Home</a> <li class="menu-list-item "><a href="/project/menu1/" class="menu-list-link ">Code blocks</a> <li class="menu-list-item active"><a href="/project/menu2/" class="menu-list-link active">More goodies</a> <li class="menu-list-item "><a href="/project/menu3/" class="menu-list-link ">Tags</a> <ul class="menu-list-child-list "> <li class="menu-list-item "><a href="#" class=menu-list-link >Submenu</a> </ul> </ul> </div> <div class=footer > This is <em>Just the docs</em>, adapted from the <a href="https://github.com/pmarsceill/just-the-docs" target=_blank >Jekyll theme</a>. </div> </div> <div class=main-content-wrap > <div class=main-content > <div class=main-header > <a id=github  href="/project//github.com/tlienart/Franklin.jl">Franklin on GitHub</a> </div> <div class=franklin-content > <h1 id=more_goodies ><a href="#more_goodies" class=header-anchor >More goodies</a></h1> <div class=franklin-toc ><ol><li><a href="#more_markdown_support">More markdown support</a><li><a href="#a_bit_more_highlighting">A bit more highlighting</a><li><a href="#more_customisation">More customisation</a><ol><li><a href="#custom_hfun">Custom &quot;hfun&quot;</a><li><a href="#custom_lx">Custom &quot;lx&quot;</a></ol><li><a href="#学习区">学习区</a><ol><li><a href="#算法区">算法区</a><li><a href="#凝聚态物理区">凝聚态物理区</a><li><a href="#量子信息区">量子信息区</a><li><a href="#数学区">数学区</a></ol><li><a href="#项目区">项目区</a><ol><li><a href="#topo-insulator_project">topo-insulator project</a><li><a href="#universal_hamiltonian_project">universal hamiltonian project</a></ol></ol></div> <h2 id=more_markdown_support ><a href="#more_markdown_support" class=header-anchor >More markdown support</a></h2> <p>The Julia Markdown parser in Julia&#39;s stdlib is not exactly complete and Franklin strives to bring useful extensions that are either defined in standard specs such as Common Mark or that just seem like useful extensions.</p> <ul> <li><p>indirect references for instance &#91;like so&#93;</p> </ul> <p> or also for images</p> <p>&#33;&#91;&#93;&#91;some image&#93;</p> <p>some people find that useful as it allows referring multiple times to the same link for instance.</p> <ul> <li><p>un-qualified code blocks are allowed and are julia by default, indented code blocks are not supported by default &#40;and there support will disappear completely in later version&#41;</p> </ul> <pre><code class="julia hljs">a = <span class=hljs-number >1</span>
+b = a+<span class=hljs-number >1</span></code></pre> <p>you can specify the default language with <code>@def lang &#61; &quot;julia&quot;</code>. If you actually want a &quot;plain&quot; code block, qualify it as <code>plaintext</code> like</p> <pre><code class="plaintext hljs">so this is plain-text stuff.</code></pre>
+<h2 id=a_bit_more_highlighting ><a href="#a_bit_more_highlighting" class=header-anchor >A bit more highlighting</a></h2>
+<p>Extension of highlighting for <code>pkg</code> an <code>shell</code> mode in Julia:</p>
+<pre><code class="julia-repl hljs"><span class=hljs-metap>(v1.4) pkg&gt;</span> add Franklin
+<span class=hljs-metas>shell&gt;</span> blah
+<span class="hljs-meta prompt_">julia&gt;</span><span class=language-julia > <span class=hljs-number >1</span>+<span class=hljs-number >1</span>
+</span><span class=hljs-metap>(Sandbox) pkg&gt;</span> resolve</code></pre>
+<p>you can tune the colouring in the CSS etc via the following classes:</p>
+<ul>
+<li><p><code>.hljs-meta</code> &#40;for <code>julia&gt;</code>&#41;</p>
+
+<li><p><code>.hljs-metas</code> &#40;for <code>shell&gt;</code>&#41;</p>
+
+<li><p><code>.hljs-metap</code> &#40;for <code>...pkg&gt;</code>&#41;</p>
+
+</ul>
+<h2 id=more_customisation ><a href="#more_customisation" class=header-anchor >More customisation</a></h2>
+<p>Franklin, by design, gives you a lot of flexibility to define how you want stuff be done, this includes doing your own parsing/processing and your own HTML generation using Julia code.</p>
+<p>In order to do this, you can define two types of functions in a <code>utils.jl</code> file which will complement your <code>config.md</code> file:</p>
+<ul>
+<li><p><code>hfun_*</code> allow you to plug custom-generated HTML somewhere</p>
+
+<li><p><code>lx_*</code> allow you to do custom parsing of markdown and generation of HTML</p>
+
+</ul>
+<p>The former &#40;<code>hfun_*</code>&#41; is most likely to be useful.</p>
+<h3 id=custom_hfun ><a href="#custom_hfun" class=header-anchor >Custom &quot;hfun&quot;</a></h3>
+<p>If you define a function <code>hfun_bar</code> in the <code>utils.jl</code> then you have access to a new template function <code>&#123;&#123;bar ...&#125;&#125;</code>. The parameters are passed as a list of strings, for instance variable names but it  could just be strings as well.</p>
+<p>For instance:</p>
+<pre><code class="julia hljs"><span class=hljs-keyword >function</span> hfun_bar(vname)
+  val = Meta.parse(vname[<span class=hljs-number >1</span>])
+  <span class=hljs-keyword >return</span> round(sqrt(val), digits=<span class=hljs-number >2</span>)
+<span class=hljs-keyword >end</span></code></pre>
+
+.hf {background-color:black;color:white;font-weight:bold;}
+
+<p>Can be called with <code>&#123;&#123;bar 4&#125;&#125;</code>: <strong>2.0</strong>.</p>
+<p>Usually you will want to pass variable name &#40;either local or global&#41; and collect their value via one of <code>locvar</code>, <code>globvar</code> or <code>pagevar</code> depending on your use case. Let&#39;s have another toy example:</p>
+<pre><code class="julia hljs"><span class=hljs-keyword >function</span> hfun_m1fill(vname)
+  var = vname[<span class=hljs-number >1</span>]
+  <span class=hljs-keyword >return</span> pagevar(<span class=hljs-string >&quot;menu1&quot;</span>, var)
+<span class=hljs-keyword >end</span></code></pre>
+<p>Which you can use like this <code>&#123;&#123;m1fill title&#125;&#125;</code>: <strong>Franklin Example</strong>. Of course  in this specific case you could also have used <code>&#123;&#123;fill title menu1&#125;&#125;</code>: <strong>Code blocks</strong>.</p>
+<p>Of course these examples are not very useful, in practice you might want to use it to generate actual HTML in a specific way using Julia code. For instance you can use it to customise how <a href="/project/menu3/#customising_tag_pages">tag pages look like</a>.</p>
+<p>A nice example of what you can do is in the <a href="https://juliasymbolics.github.io/SymbolicUtils.jl/api/">SymbolicUtils.jl manual</a> where they use a <code>hfun_</code> to generate HTML encapsulating the content of code docstrings, in a way doing something similar to what Documenter does. See <a href="https://github.com/JuliaSymbolics/SymbolicUtils.jl/blob/website/utils.jl">how they defined it</a>.</p>
+<p><strong>Note</strong>: the  output <strong>will not</strong> be reprocessed by Franklin, if you want to generate markdown which should be processed by Franklin, then use <code>return fd2html&#40;markdown, internal&#61;true&#41;</code> at the end.</p>
+<h3 id=custom_lx ><a href="#custom_lx" class=header-anchor >Custom &quot;lx&quot;</a></h3>
+<p>These commands will look the same as latex commands but what they do with their content is now entirely controlled by your code. You can use this to do your own parsing of specific chunks of your content if you so desire.</p>
+<p>The definition of <code>lx_*</code> commands <strong>must</strong> look like this:</p>
+<pre><code class="julia hljs"><span class=hljs-keyword >function</span> lx_baz(com, _)
+  <span class=hljs-comment ># keep this first line</span>
+  brace_content = Franklin.content(com.braces[<span class=hljs-number >1</span>]) <span class=hljs-comment ># input string</span>
+  <span class=hljs-comment ># do whatever you want here</span>
+  <span class=hljs-keyword >return</span> uppercase(brace_content)
+<span class=hljs-keyword >end</span></code></pre>
+<p>You can call the above with <code>\baz&#123;some string&#125;</code>: SOME STRING.</p>
+<p><strong>Note</strong>: the output <strong>will be</strong> reprocessed by Franklin, if you want to avoid this, then escape the output by using <code>return &quot;~~~&quot; * s * &quot;~~~&quot;</code> and it will be plugged  in as is in the HTML.</p>
+<h2 id="学习区"><a href="#学习区" class=header-anchor >学习区</a></h2>
+<div class=franklin-toc ><ol><li><a href="#evaluation_of_code">evaluation of code</a><li><a href="#including_scripts">Including scripts</a></ol></div>
+<h3 id="算法区"><a href="#算法区" class=header-anchor >算法区</a></h3>
+<p>计算基态能量和基态波函数的算法</p>
+<ol>
+<li><p>MordernSC 里面的算法【lanzcos 自动微分等】写note和作业</p>
+
+<li><p>tensor network </p>
+
+<li><p>TRG</p>
+
+<li><p>genericTN</p>
+
+<li><p>DMRG/CTMRG</p>
+
+<li><p>【谢志远老师slides和综述】 &#91;note 要包括基本物理图像，可以应用的系统，&#93;</p>
+
+<li><p>量子蒙卡算法【note SSE VMC】</p>
+
+<li><p>解析延拓算法【note】</p>
+
+<li><p>simulated annealing /quantum annealing / parallel tempering【note】</p>
+
+<li><p>spin-glass 统计物理和机器学习的联系【note】</p>
+
+<li><p>变分量子算法【note】</p>
+
+<li><p>限制波尔兹曼机【note】</p>
+
+</ol>
+<h3 id="凝聚态物理区"><a href="#凝聚态物理区" class=header-anchor >凝聚态物理区</a></h3>
+<ol>
+<li><p>topo insulator &#91;note &#43; code&#93;</p>
+<ol>
+<li><p>berry phase</p>
+
+<li><p>chern number QHE</p>
+
+<li><p>QSH effect</p>
+
+<li><p>QAH effect</p>
+
+<li><p>weyl semimetal...nodal line ,majorlana zero mode </p>
+
+<li><p>分数量子霍尔效应**</p>
+
+<li><p>拓扑超导</p>
+
+</ol>
+
+<li><p>重整化群流 &#91;note &#43; code&#93; 重整化方法**</p>
+<ol>
+<li><p>renormalization group</p>
+
+<li><p>Kadanoff block spin</p>
+
+<li><p>Wilson block spin</p>
+
+<li><p>重整化群流</p>
+
+<li><p>量子相变</p>
+
+</ol>
+
+<li><p>superconductivity &#91;note &#43; code&#93;</p>
+<ol>
+<li><p>BCS theory</p>
+
+<li><p>Ginzburg-Landau theory 超导*序参量**</p>
+
+<li><p>Bogoliubov-de Gennes equation</p>
+
+<li><p>格林函数**/隶玻色子</p>
+
+<li><p>非常规超导 【cuprate】</p>
+
+<li><p>超导相变</p>
+
+</ol>
+
+<li><p>quantum spin liquid  &#91;note &#43; code&#93;</p>
+<ol>
+<li><p>RVB/spinon</p>
+
+</ol>
+
+<li><p>安德森局域化 &#91;note &#43; code&#93;</p>
+
+</ol>
+<h3 id="量子信息区"><a href="#量子信息区" class=header-anchor >量子信息区</a></h3>
+<ol>
+<li><p>toric code &#91;note &#43; code&#93; anyon</p>
+
+<li><p>密度矩阵和纠缠熵，量子系综 &#91;note &#43; code&#93; </p>
+
+</ol>
+<h3 id="数学区"><a href="#数学区" class=header-anchor >数学区</a></h3>
+<ol>
+<li><p>高等代数 ，矩阵分析** tensor network &#91;note &#43; code&#93;</p>
+
+<li><p>群论 &#91;note &#43; code&#93;【李群李代数***】【纤维丛】【点群】</p>
+
+<li><p>微分几何 &#91;note &#43; code&#93;</p>
+<ol>
+<li><p>流形</p>
+
+<li><p>流形上的张量场</p>
+
+<li><p>流形上的微分形式</p>
+
+<li><p>流形上的度量</p>
+
+<li><p>流形上的联络</p>
+
+<li><p>流形上的曲率</p>
+
+</ol>
+
+<li><p>复分析** 泛函分析</p>
+
+<li><p>偏微分方程** 数值技巧【数学物理方程】</p>
+
+<li><p>范畴论</p>
+
+<li><p>辛几何与哈密顿雅可比方程</p>
+
+</ol>
+<h2 id="项目区"><a href="#项目区" class=header-anchor >项目区</a></h2>
+<h3 id=topo-insulator_project ><a href="#topo-insulator_project" class=header-anchor >topo-insulator project</a></h3>
+<ol>
+<li><p>边复现python代码 边按综述写note，边写代码</p>
+
+<li><p>提出可能的项目方向【wTe 二维转角材料】 </p>
+
+</ol>
+<h3 id=universal_hamiltonian_project ><a href="#universal_hamiltonian_project" class=header-anchor >universal hamiltonian project</a></h3>
+<ol>
+<li><p>复现SSE on Rydberg atom array &#91;quantum spin liquid &#93;</p>
+
+<li><p>QMC sign problem 【调研&#43;note&#43;读孟子杨老师组避免sign problem 论文】</p>
+
+<li><p>对此论文idea 进行推进 Quantum optimization within lattice gauge theory model on a quantum simulator 【用GTN 简化模型】</p>
+
+<li><p>研究哈密顿量的UMA-complete性质 有效哈密顿量【探究是否能模拟超导量子体系-强关联，量子长程纠缠系统，经典长程纠缠，拓扑保护体系spin liquid ,spin glass, topo体系】**</p>
+
+<li><p>里德保原子阵列作为模拟器</p>
+
+</ol>
+<p>universal H 在Rydberg体系下模拟平衡态系统，模拟平衡态系统的动力学演化，格林函数可以表示含时关联响应，也可描述定态微扰响应（定态有效哈密顿量） 经典哈密顿量演化（自旋玻璃态）基态简并性质【从一个基态到另一个基态跃迁中的拓扑保护效应（QA，SA，SSE，QMC）</p>
+<div class=page-foot >
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> Zhou Pan. Last modified: 0001-01-01.
+    Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+</div>
+</div>
+    </div> 
+    </div> 
+    </div> <!-- end of class page-wrap-->
+    
+    
+      <script src="/project/libs/highlight/highlight.min.js"></script>
+<script>hljs.highlightAll();hljs.configure({tabReplace: '    '});</script>
