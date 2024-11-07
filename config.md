@@ -17,14 +17,14 @@ ignore = ["node_modules/"]
 
 # RSS (the website_{title, descr, url} must be defined to get RSS)
 generate_rss = true
-website_title = "site for blogs"
-website_descr = "ZK website using Franklin"
-website_url   = "https://tlienart.github.io/FranklinTemplates.jl/"
+website_title = "Catherine Z's blogs"
+website_descr = "ZK website "
+website_url   = "https://panzk1.github.io"
 +++
 
-+++
-prepath = "project"
-+++
+#+++
+#prepath = ""
+#+++
 
 <!--
 Add here global latex commands to use throughout your pages.
